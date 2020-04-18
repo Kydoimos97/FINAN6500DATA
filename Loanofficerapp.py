@@ -31,7 +31,7 @@ warnings.warn = ingore_warn #Ignore warnings
 
 # Lists to show in Combos
 
-train = pd.read_excel("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/SBA_training_data%20(1).xlsx")
+train = pd.read_excel("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/data/SBA_training_data.xlsx")
 recession = pd.read_csv("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/JHDUSRGDPBR.csv")
 
 
@@ -135,7 +135,7 @@ z = train
 
 #Picture
 import urllib.request
-urllib.request.urlretrieve("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/logo.gif", "logo.gif")
+urllib.request.urlretrieve("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/data/logo.gif", "logo.gif")
 
 ## States
 states = sorted(list(z['BankState']))
