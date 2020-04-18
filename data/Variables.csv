@@ -1,4 +1,4 @@
-Variable name,Data type,Description of variable,Imputation?
+Variable name,Data type,Description of variable
 LoanNr_ChkDgt,Text,Identifier – Primary key,
 Name,Text,Borrower name,
 City,Text,Borrower city,
