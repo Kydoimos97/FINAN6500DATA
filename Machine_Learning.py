@@ -503,6 +503,16 @@ plt.xlabel("Unique Values")
 plt.ylabel("Frequency")
 ax.set_xticks(range(0, 2))
 ax.set_xticklabels(range(0,2))
+for x,y in zip(y_ChgOffDate_num,freq):
+
+    label = y
+
+    plt.annotate(label, # this is the text
+                 (x,y), # this is the point to label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,-(y/70)), # distance from text to points (x,y)
+                 ha='center', # horizontal alignment can be left, right or center 
+                 color='w', size=14)
 
 plt.show()
 
@@ -739,35 +749,57 @@ model_xgb = xgb.XGBClassifier(colsample_bytree=0.5, gamma=0.5,
 y_train = y_ChgOffDate #Target Variable
 
 
-# ## Find Accuracy Scores by using Cross-Validation
-
 # In[43]:
+
+
+# Initizialise List to save results
+modelnames = ['Random forest Classifcation', 'Support Vector Classifcation', 'K-Neighbours Classifcation', 'XGBoost Classifcation']
+CV_scores = []
+OS_HO_scores = []
+IS_HO_scores = []
+
+
+# ## Find Accuracy Scores by Validation
+
+# ### Random forest Classifcation
+
+# In[44]:
 
 
 score_RFC = acc_cv(model_RFC)
 print("Random Forest Cross-Val Accuracy score: {:.4f} ({:.4f})\n".format(score_RFC.mean(), score_RFC.std()))
+CV_scores.append(score_RFC.mean())
 
+#####Hold-Out#####
 model_RFC.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
 
 RFC_train_pred = model_RFC.predict(HO_X_train1) #InSample Holdout RMSE
 
 RFC_pred_HO = model_RFC.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
 print("\n")
 print("########In-Sample Hold-Out########")
 print(pd.crosstab(HO_y_train_CL, RFC_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("In-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_train_CL, RFC_train_pred, normalize=True, sample_weight=None))
+hold_out_insample_RFC_score = accuracy_score(HO_y_train_CL, RFC_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_RFC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_RFC_score))
 print("\n")
 print("########Out-Of-Sample Hold-Out########")
 print(pd.crosstab(HO_y_test_CL, RFC_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_test_CL, RFC_pred_HO, normalize=True, sample_weight=None))
+hold_out_outsample_RFC_score = accuracy_score(HO_y_test_CL, RFC_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_RFC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_RFC_score))
 
 
-# In[44]:
+# ### Support Vector Classifcation
+
+# In[45]:
 
 
 #####Cross-Validation#####
 score_SVC = acc_cv(model_SVC)
 print("SVC Accuracy score: {:.4f} ({:.4f})\n".format(score_SVC.mean(), score_SVC.std()))
+CV_scores.append(score_SVC.mean())
 
 #####Hold-Out#####
 model_SVC.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
@@ -779,19 +811,27 @@ SVC_pred_HO = model_SVC.predict(HO_X_test1) #Out of Sample Holdout RMSE
 print("\n")
 print("########In-Sample Hold-Out########")
 print(pd.crosstab(HO_y_train_CL, SVC_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_train_CL, SVC_train_pred, normalize=True, sample_weight=None))
+hold_out_insample_SVC_score = accuracy_score(HO_y_train_CL, SVC_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_SVC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_SVC_score))
 print("\n")
 print("########Out-Of-Sample Hold-Out########")
 print(pd.crosstab(HO_y_test_CL, SVC_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_test_CL, SVC_pred_HO, normalize=True, sample_weight=None))
+hold_out_outsample_SVC_score = accuracy_score(HO_y_test_CL, SVC_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_SVC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_SVC_score))
 
 
-# In[45]:
+# ### K-Neighbours Classifcation
+
+# In[46]:
 
 
 score_KNN = acc_cv(model_KNN)
 print("KNN Accuracy score: {:.4f} ({:.4f})\n".format(score_KNN.mean(), score_KNN.std()))
+CV_scores.append(score_KNN.mean())
 
+#####Hold-Out#####
 model_KNN.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
 
 KNN_train_pred = model_KNN.predict(HO_X_train1) #InSample Holdout RMSE
@@ -801,19 +841,31 @@ KNN_pred_HO = model_KNN.predict(HO_X_test1) #Out of Sample Holdout RMSE
 print("\n")
 print("########In-Sample Hold-Out########")
 print(pd.crosstab(HO_y_train_CL, KNN_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_train_CL, KNN_train_pred, normalize=True, sample_weight=None))
+hold_out_insample_KNN_score = accuracy_score(HO_y_train_CL, KNN_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_KNN_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_KNN_score))
 print("\n")
 print("########Out-Of-Sample Hold-Out########")
 print(pd.crosstab(HO_y_test_CL, KNN_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_test_CL, KNN_pred_HO, normalize=True, sample_weight=None))
+hold_out_outsample_KNN_score = accuracy_score(HO_y_test_CL, KNN_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_KNN_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_KNN_score))
 
 
-# In[46]:
+# In[47]:
+
+
+### XGBoost Classifcation
+
+
+# In[48]:
 
 
 score_xgb = acc_cv(model_xgb)
 print("Xgboost Accuracy score: {:.4f} ({:.4f})\n".format(score_xgb.mean(), score_xgb.std()))
+CV_scores.append(score_xgb.mean())
 
+#####Hold-Out#####
 model_xgb.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
 
 xgb_train_pred = model_xgb.predict(HO_X_train1) #InSample Holdout RMSE
@@ -823,72 +875,163 @@ xgb_pred_HO = model_xgb.predict(HO_X_test1) #Out of Sample Holdout RMSE
 print("\n")
 print("########In-Sample Hold-Out########")
 print(pd.crosstab(HO_y_train_CL, xgb_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_train_CL, xgb_train_pred, normalize=True, sample_weight=None))
+hold_out_insample_xgb_score = accuracy_score(HO_y_train_CL, xgb_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_xgb_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_xgb_score))
 print("\n")
 print("########Out-Of-Sample Hold-Out########")
 print(pd.crosstab(HO_y_test_CL, xgb_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
-print("Out-Of-Sample Hold-Out Accuracy = ",accuracy_score(HO_y_test_CL, xgb_pred_HO, normalize=True, sample_weight=None))
+hold_out_outsample_xgb_score = accuracy_score(HO_y_test_CL, xgb_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_xgb_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_xgb_score))
+
+
+# In[49]:
+
+
+# Create Overview DataFrame
+scores_tuples = list(zip(modelnames,CV_scores, OS_HO_scores, IS_HO_scores))
+scores_df = pd.DataFrame(scores_tuples, columns=['Model','CV_Score', 'HO_Out-Of-Sample_Score','HO_In-Sample_Score'])
+scores_df = scores_df.round(4)
+scores_df.sort_values(by=['CV_Score'], inplace=True, ascending=False)
+scores_df.reset_index(inplace=True, drop=True)
 
 
 # ## Evaluation of Scores
 
-# In[47]:
+# In[66]:
 
 
-scores = {'RFC' : score_RFC.mean(),
-                   'SVC': score_SVC.mean(), 
-                   'KNN' : score_KNN.mean(), 
-                   'XGB' : score_xgb.mean()}
+scores = {'RFC' : score_RFC.mean()*100,
+                   'SVC': score_SVC.mean()*100, 
+                   'KNN' : score_KNN.mean()*100, 
+                   'XGB' : score_xgb.mean()*100}
 scores_sorted = {k: v for k, v in sorted(scores.items(), reverse=True, key=lambda item: item[1])}
 
 scores_sorted
 keys = scores_sorted.keys()
 values = scores_sorted.values()
 
+formatted_values = []
+for item in values :
+    formatted_values.append("%.2f"%item)
 
 
-barplot = plt.bar(keys, values)
-barplot[0].set_color('g')
-barplot[1].set_color('b')
-barplot[2].set_color('orange')
-barplot[3].set_color('red')
-plt.title("Accuracy Scores of Algorithms")
+barplot = plt.bar(keys, values, edgecolor='black', color=['C2', 'C0', 'C1', 'C3'])
+plt.title("Accuracy Scores of Algorithms in percentages")
 plt.xlabel("Algorithms")
 plt.ylabel("Accuracy")
+for x,y,z in zip(keys,values,formatted_values):
+
+    label = z
+
+    plt.annotate(label, # this is the text
+                 (x,y), # this is the point to label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,-25), # distance from text to points (x,y)
+                 ha='center', # horizontal alignment can be left, right or center 
+                 color='w', size=14)
 
 plt.show()
 
-
-scores = pd.DataFrame.from_dict(scores, orient='index',columns=['Score'])
-
-scores.sort_values(by = 'Score', ascending=False)
+scores_df.head(4)
 
 
 # There are two models who are predicting with high accuracy namely: XGBoost and Random Forest. I will use both these in the Loan officer app of step 9. I will also print both of the generaterd predicted values to a CSV since both of these algorithms seem to be quite accuracte. 
 
 # ## Exporting Predictions
 
-# In[48]:
+# In[51]:
 
 
 model_xgb.fit(train, y_train) #Train on Full Train Data
 xgb_pred = model_xgb.predict(test) #Predict on Test
-xgb_pred = pd.DataFrame(xgb_pred)
-xgb_pred.to_csv('xgb_classifier_pred.csv',index=False)
+xgb_pred_df = pd.DataFrame(xgb_pred)
+xgb_pred_df.to_csv('xgb_classifier_pred.csv',index=True)
 
 
-# In[49]:
+# In[52]:
+
+
+c = list(xgb_pred.astype("int"))
+name = str(c).split()
+
+c = collections.Counter(c)
+c = sorted(c.items())
+xgb_pred_num = [i[0] for i in c]
+xgb_pred_names = [name[i[0]-1] for i in c]
+freq = [i[1] for i in c]
+
+f, ax = plt.subplots()
+
+plt.bar(xgb_pred_num, freq, edgecolor='black')
+plt.title("Frequency of unique values in XGB_pred")
+plt.xlabel("Unique Values")
+plt.ylabel("Frequency")
+for x,y in zip(xgb_pred_num,freq):
+
+    label = y
+
+    plt.annotate(label, # this is the text
+                 (x,y), # this is the point to label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,(-y/7)), # distance from text to points (x,y)
+                 ha='center', # horizontal alignment can be left, right or center 
+                 color='w', size=14)
+   
+ax.set_xticks(range(0, 2))
+ax.set_xticklabels(range(0,2))
+
+plt.show()
+
+
+# In[56]:
 
 
 model_RFC.fit(train, y_train) #Train on Full Train Data
 RFC_pred = model_RFC.predict(test) #Predict on Test
-RFC_pred = pd.DataFrame(RFC_pred)
-RFC_pred.to_csv("RFC_classifier_pred.csv",index=False)
+RFC_pred_df = pd.DataFrame(RFC_pred)
+RFC_pred_df.to_csv('xgb_classifier_pred.csv',index=False)
+
+
+# In[57]:
+
+
+c = list(RFC_pred.astype("int"))
+name = str(c).split()
+
+c = collections.Counter(c)
+c = sorted(c.items())
+RFC_pred_num = [i[0] for i in c]
+RFC_pred_names = [name[i[0]-1] for i in c]
+freq = [i[1] for i in c]
+
+f, ax = plt.subplots()
+
+plt.bar(RFC_pred_num, freq, edgecolor='black')
+plt.title("Frequency of unique values in RFC_pred")
+plt.xlabel("Unique Values")
+plt.ylabel("Frequency")
+for x,y in zip(RFC_pred_num,freq):
+
+    label = y
+
+    plt.annotate(label, # this is the text
+                 (x,y), # this is the point to label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,(-y/7)), # distance from text to points (x,y)
+                 ha='center', # horizontal alignment can be left, right or center 
+                 color='w', size=14)
+    
+ax.set_xticks(range(0, 2))
+ax.set_xticklabels(range(0,2))
+
+plt.show()
 
 
 # ##### Stop Code Timing
 
-# In[50]:
+# In[55]:
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
