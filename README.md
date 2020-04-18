@@ -7,6 +7,6 @@ and write an app that loan officers could use to predict loans based on their in
 The Code is written in Python 3 with the initial file being machine_learning.
 The app aplies code written in the machine_learning file to predict but is compeletely standalone. 
 
-If code is used please reference this repository.
+If code is extracted/copied please reference this repository.
 
 
