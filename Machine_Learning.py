@@ -29,6 +29,9 @@ import seaborn as sns #Plots
 import warnings
 from scipy import stats
 from scipy.stats import norm, skew
+#from numba import jit, cuda 
+
+
 # Set seaborn settings
 color = sns.color_palette("bright")
 #plt.style.use('dark_background')
@@ -37,6 +40,8 @@ color = sns.color_palette("bright")
 def ingore_warn(*args, **kwargs):
     pass
 warnings.warn = ingore_warn #Ignore warnings
+
+pd.set_option('display.max_rows', 15)
 
 
 # # Import Data
@@ -72,15 +77,9 @@ print(list(train.columns))
 print(format(train.shape))
 
 
-# In[6]:
-
-
-print(train['MIS_Status'].value_counts())
-
-
 # ### Missing Values
 
-# In[7]:
+# In[6]:
 
 
 # Missing Values
@@ -92,7 +91,7 @@ trainnulldf = trainnulldf.drop(trainnulldf[(trainnulldf['Sum of Missing']==0)].i
 
 print(trainnulldf)    
 
-
+plt.subplots(figsize=(12,9))
 sns.barplot(x=trainnulldf.index, y=trainnulldf['Sum of Missing'])
 plt.xticks(rotation='90')
 plt.title('Missing Ratio in the Train data set')
@@ -124,7 +123,7 @@ plt.xlabel('Features', fontsize=15)
 
 # ### Na imputation
 
-# In[8]:
+# In[7]:
 
 
 #Number 3  
@@ -139,7 +138,7 @@ for i in train.index:
 print(train['RevLineCr'].value_counts())
 
 
-# In[9]:
+# In[8]:
 
 
 #Number 4  
@@ -154,7 +153,7 @@ for i in train.index:
 print(train['LowDoc'].value_counts())
 
 
-# In[10]:
+# In[9]:
 
 
 #Number 5
@@ -169,7 +168,7 @@ for i in train.index:
 print(train['ChgOffDate'].value_counts())
 
 
-# In[11]:
+# In[10]:
 
 
 #Number 10 
@@ -184,19 +183,18 @@ for i in train.index:
 print(train['FranchiseCode'].value_counts())
 
 
-# In[12]:
+# In[11]:
 
 
 # Number 1
 train.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
 
 # Number 2
-train.dropna(subset=['NAICS'], inplace=True)
+train.drop(columns=['NAICS'], inplace=True)
 
 # Number 6
 train.dropna(subset=['Bank'], inplace=True)
 train.dropna(subset=['BankState'], inplace=True)
-train.dropna(subset=['DisbursementDate'], inplace=True)
 
 # Number 7
 train.drop(columns=['BalanceGross'], inplace=True)
@@ -211,10 +209,11 @@ train.drop(columns=['Zip'], inplace=True)
 #Remove Specific Dates?
 train.drop(columns=['ApprovalDate'], inplace=True)
 train.drop(columns=['DisbursementDate'], inplace=True)
-train.drop(columns=['NAICS'], inplace=True)
+
+print(format(train.shape))
 
 
-# In[13]:
+# In[12]:
 
 
 # Missing Values
@@ -229,7 +228,7 @@ print(trainnulldf)
 
 # ## Test
 
-# In[14]:
+# In[13]:
 
 
 print(test.head(10))
@@ -239,7 +238,7 @@ print(format(test.shape))
 
 # ### Missing Values
 
-# In[15]:
+# In[14]:
 
 
 testnull = test.isnull().sum()
@@ -250,7 +249,7 @@ testnulldf = testnulldf.drop(testnulldf[(testnulldf['Sum of Missing']==0)].index
 
 print(testnulldf)    
 
-#plt.subplots(figsize=(12,9))
+plt.subplots(figsize=(12,9))
 sns.barplot(x=testnulldf.index, y=testnulldf['Sum of Missing'])
 plt.xticks(rotation='90')
 plt.title('Missing Ratio in the Train data set')
@@ -260,7 +259,7 @@ plt.xlabel('Features', fontsize=15)
 
 # Here I will do the same imputation and transformation I have done for the train data set with the exception of the target variables. 
 
-# In[16]:
+# In[15]:
 
 
 #Number 3  
@@ -275,7 +274,7 @@ for i in test.index:
 print(test['RevLineCr'].value_counts())
 
 
-# In[17]:
+# In[16]:
 
 
 #Number 4  
@@ -290,7 +289,7 @@ for i in test.index:
 print(test['LowDoc'].value_counts())
 
 
-# In[18]:
+# In[17]:
 
 
 #Number 10 
@@ -305,19 +304,18 @@ for i in test.index:
 print(test['FranchiseCode'].value_counts())
 
 
-# In[19]:
+# In[18]:
 
 
 # Number 1
 test.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
 
 # Number 2
-test.dropna(subset=['NAICS'], inplace=True)
+test.drop(columns=['NAICS'], inplace=True)
 
 # Number 6
 test.dropna(subset=['Bank'], inplace=True)
 test.dropna(subset=['BankState'], inplace=True)
-test.dropna(subset=['DisbursementDate'], inplace=True)
 
 # Number 7
 test.drop(columns=['BalanceGross'], inplace=True)
@@ -329,10 +327,11 @@ test.drop(columns=['Zip'], inplace=True)
 #Remove Specific Dates?
 test.drop(columns=['ApprovalDate'], inplace=True)
 test.drop(columns=['DisbursementDate'], inplace=True)
-test.drop(columns=['NAICS'], inplace=True)
+
+print(format(test.shape))
 
 
-# In[20]:
+# In[19]:
 
 
 # Missing Values
@@ -355,7 +354,7 @@ plt.xlabel('Features', fontsize=15)
 
 # here I compare columns to make sure that the data sets are identical in its variables, if they are not algorithms will throw errors or warnings.
 
-# In[21]:
+# In[20]:
 
 
 traincol = list(train.columns)
@@ -376,7 +375,7 @@ print("Test Dimensions:", format(test.shape))
 
 # Data sets will be merged for easier label and one-hot encoding, together with skewness analysis. I do this now since when the NA's were imputed a number of rows were removed which would change the shape of the data sets making it hard to find out where to cut them apart later.
 
-# In[22]:
+# In[21]:
 
 
 # Save Rowcount of Data set to seperate later
@@ -405,7 +404,7 @@ print(format(alldata.shape))
 # 
 # The Data Comes from the St. Louid Federal Reserve Bank more about them here: https://research.stlouisfed.org/about.html
 
-# In[23]:
+# In[22]:
 
 
 recession = pd.read_csv("https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=off&txtcolor=%23444444&ts=12&tts=12&width=1168&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=JHDUSRGDPBR&scale=left&cosd=1967-10-01&coed=2019-07-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2009-06-01&line_index=1&transformation=lin&vintage_date=2020-04-15&revision_date=2020-04-15&nd=1967-10-01")
@@ -419,7 +418,7 @@ recession['Recession'] = recession['Recession'].astype('int64').astype(dtype="ca
 recession['Year'] = recession['Date'].dt.year
 
 
-# In[24]:
+# In[23]:
 
 
 recession = recession.reset_index()
@@ -433,7 +432,7 @@ values = tuple(recession.to_numpy()[0])
 rename_dict = dict(zip(keys, values))
 
 
-# In[25]:
+# In[24]:
 
 
 alldata['Recession'] = alldata['ApprovalFY']
@@ -445,7 +444,7 @@ print(alldata['Recession'].value_counts())
 
 # ## Further Cleaning of AllData
 
-# In[26]:
+# In[25]:
 
 
 y_MIS_Status = pd.DataFrame(y_MIS_Status)
@@ -464,7 +463,7 @@ print(y_MIS_Status[0].value_counts())
 y_MIS_Status = y_MIS_Status.to_numpy()
 
 
-# In[27]:
+# In[26]:
 
 
 # Give Correct Data Label to target variables
@@ -479,7 +478,7 @@ y_ChgOffPrinGr = y_ChgOffPrinGr.astype('int')
 
 # For the target variable I will use CHGOffDate with classification algortihms. I chose this variable because when cleaning the data set I changed more about MIS_Status then I did to ChgOffDate therefore making ChgOffDate a more relibable predictor. Also after trying over and over again to improve regression scores on ChgOffPrinGr I ended up with an error of around 50k. I ran into the variable having a zero-inflated probability distribution which I don't know how to deal with as if now. I therefore chose to remove this variable as a target and focus on classification. 
 
-# In[28]:
+# In[27]:
 
 
 import collections
@@ -517,40 +516,9 @@ for x,y in zip(y_ChgOffDate_num,freq):
 plt.show()
 
 
-# In[29]:
-
-
-# Plot the distribution of the target variable
-plt.hist(y_ChgOffPrinGr, edgecolor='black')
-plt.ylabel('Frequency') # Add the Title
-plt.title('y_ChgOffPrinGr distribution')
-plt.show()
-
-# Plot the QQ-plot of the target variable
-
-fig = plt.figure()
-res = stats.probplot(y_ChgOffPrinGr, plot=plt)
-plt.show()
-
-
-# In[30]:
-
-
-# Plot the distribution of the target variable
-plt.hist(np.log1p(y_ChgOffPrinGr), edgecolor='black')
-plt.ylabel('Frequency') # Add the Title
-plt.title('y_ChgOffPrinGr distribution tranformed with the natural logarithm of one plus the input array')
-
-# Plot the QQ-plot of the target variable
-
-fig = plt.figure()
-res = stats.probplot(np.log1p(y_ChgOffPrinGr), plot=plt)
-plt.show()
-
-
 # ## Correlation Matrix
 
-# In[31]:
+# In[28]:
 
 
 correlation = train.corr()
@@ -563,7 +531,7 @@ sns.heatmap(correlation, xticklabels=correlation.columns.values,
 
 # Bank is label encoded since one-hot encoding it will create a data set that is so big it hinders performance to an extreme degree. 
 
-# In[32]:
+# In[29]:
 
 
 from sklearn.preprocessing import LabelEncoder
@@ -578,7 +546,7 @@ print(format(alldata.shape))
 
 # ## Skewness and Box-Cox Transformations
 
-# In[33]:
+# In[30]:
 
 
 numeric_feats = alldata.dtypes[alldata.dtypes == "int64"].index
@@ -590,7 +558,7 @@ skewness = pd.DataFrame({'Skew' :skewed_feats})
 skewness.head(21)
 
 
-# In[34]:
+# In[31]:
 
 
 skewness = skewness[abs(skewness) > .75]
@@ -613,14 +581,14 @@ skewness.head(21)
 
 # ## One-hot Encoding
 
-# In[35]:
+# In[32]:
 
 
 print("Variables that will be one-hot encoded are:", list(alldata.dtypes[alldata.dtypes == "object"].index))
 print(alldata.shape)
 
 
-# In[36]:
+# In[33]:
 
 
 alldata = pd.get_dummies(alldata)
@@ -629,7 +597,7 @@ print(alldata.shape)
 
 # ## Recreate Train and Test Data Sets
 
-# In[37]:
+# In[34]:
 
 
 train = alldata[:ntrain]
@@ -640,7 +608,7 @@ test = alldata[ntrain:]
 
 # I looked into data scaling to help with an ill-condition matrix warning thrown by the KRR algorithm. While I normally would scale my data, this would make it extremely hard to do point 8 effectively. Additionally I am not using any Kernel tricks anymore so this is less of a problem now.
 
-# In[38]:
+# In[35]:
 
 
 #from sklearn.preprocessing import StandardScaler
@@ -658,7 +626,7 @@ test = alldata[ntrain:]
 
 # I do this since the correct answers aren't available and I want to make sure my algorithms perform. By utilizing crossvalidation and Hold-Out evaluation I can be confident about my results. This also allows me to easily see my insample accuracy which means I can combat overfitting more easily.
 
-# In[39]:
+# In[36]:
 
 
 from sklearn.model_selection import train_test_split
@@ -672,7 +640,7 @@ HO_X_train2, HO_X_test2, HO_y_train_CO, HO_y_test_CO = train_test_split(train, y
 
 # The Main metric I will use to evaulate my alogrithms is the accuracy measure.
 
-# In[40]:
+# In[37]:
 
 
 #Validation function
@@ -688,7 +656,7 @@ def acc_cv(model):
 
 # ## Load Algorithms
 
-# In[41]:
+# In[38]:
 
 
 from sklearn.model_selection import KFold, cross_val_score, train_test_split
@@ -706,6 +674,12 @@ from sklearn.ensemble import RandomForestClassifier
 
 #Support Vector Classification.
 from sklearn.svm import SVC
+
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.tree import DecisionTreeClassifier
+
+from sklearn.model_selection import GridSearchCV
 
 # Calculate RMSE
 from sklearn.metrics import mean_squared_error
@@ -729,7 +703,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 # #### XGBoost
 # https://xgboost.readthedocs.io/en/latest/parameter.html
 
-# In[42]:
+# In[39]:
 
 
 model_SVC = SVC(cache_size = 8000)
@@ -740,20 +714,24 @@ model_RFC = RandomForestClassifier(n_jobs = -1)
 
 
 model_xgb = xgb.XGBClassifier(colsample_bytree=0.5, gamma=0.5, 
-                             learning_rate=0.1, max_depth=6, 
-                             min_child_weight=1.5, n_estimators=2200,
-                             reg_alpha=0.25, reg_lambda=0.5,
-                             subsample=0.5, silent=1,
-                             random_state =7, nthread = -1)
+                             learning_rate=0.1, max_depth=5, 
+                             min_child_weight=1, n_estimators=350,
+                             reg_alpha=0.25, reg_lambda = 0.5,
+                             subsample=0.5, silent=1, scale_pos_weight = 1,
+                             random_state =123, nthread = -1)
+
+model_LGR = LogisticRegression(max_iter=10000)
+
+model_DTC = DecisionTreeClassifier(max_depth=10, max_features = None, min_samples_leaf = 40)
 
 y_train = y_ChgOffDate #Target Variable
 
 
-# In[43]:
+# In[40]:
 
 
 # Initizialise List to save results
-modelnames = ['Random forest Classifcation', 'Support Vector Classifcation', 'K-Neighbours Classifcation', 'XGBoost Classifcation']
+modelnames = ['Random forest Classification', 'Logistic Regression', 'Decision Trees Classifier', 'Support Vector Classification', 'K-Neighbors Classification', 'XGBoost Classification']
 CV_scores = []
 OS_HO_scores = []
 IS_HO_scores = []
@@ -763,7 +741,7 @@ IS_HO_scores = []
 
 # ### Random forest Classifcation
 
-# In[44]:
+# In[41]:
 
 
 score_RFC = acc_cv(model_RFC)
@@ -791,9 +769,69 @@ OS_HO_scores.append(hold_out_outsample_RFC_score)
 print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_RFC_score))
 
 
+# ### Logistic Regression
+
+# In[42]:
+
+
+score_LGR = acc_cv(model_LGR)
+print("Logistic Regression Cross-Val Accuracy score: {:.4f} ({:.4f})\n".format(score_LGR.mean(), score_LGR.std()))
+CV_scores.append(score_LGR.mean())
+
+#####Hold-Out#####
+model_LGR.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
+
+LGR_train_pred = model_LGR.predict(HO_X_train1) #InSample Holdout RMSE
+
+LGR_pred_HO = model_LGR.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
+print("\n")
+print("########In-Sample Hold-Out########")
+print(pd.crosstab(HO_y_train_CL, LGR_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_insample_LGR_score = accuracy_score(HO_y_train_CL, LGR_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_LGR_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_LGR_score))
+print("\n")
+print("########Out-Of-Sample Hold-Out########")
+print(pd.crosstab(HO_y_test_CL, LGR_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_outsample_LGR_score = accuracy_score(HO_y_test_CL, LGR_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_LGR_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_LGR_score))
+
+
+# ### Decision Trees
+
+# In[43]:
+
+
+score_DTC = acc_cv(model_DTC)
+print("Decision Trees Cross-Val Accuracy score: {:.4f} ({:.4f})\n".format(score_DTC.mean(), score_DTC.std()))
+CV_scores.append(score_DTC.mean())
+
+#####Hold-Out#####
+model_DTC.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
+
+DTC_train_pred = model_DTC.predict(HO_X_train1) #InSample Holdout RMSE
+
+DTC_pred_HO = model_DTC.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
+print("\n")
+print("########In-Sample Hold-Out########")
+print(pd.crosstab(HO_y_train_CL, DTC_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_insample_DTC_score = accuracy_score(HO_y_train_CL, DTC_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_DTC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_DTC_score))
+print("\n")
+print("########Out-Of-Sample Hold-Out########")
+print(pd.crosstab(HO_y_test_CL, DTC_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_outsample_DTC_score = accuracy_score(HO_y_test_CL, DTC_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_DTC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_DTC_score))
+
+
 # ### Support Vector Classifcation
 
-# In[45]:
+# In[44]:
 
 
 #####Cross-Validation#####
@@ -824,7 +862,7 @@ print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_SVC_s
 
 # ### K-Neighbours Classifcation
 
-# In[46]:
+# In[45]:
 
 
 score_KNN = acc_cv(model_KNN)
@@ -852,13 +890,9 @@ OS_HO_scores.append(hold_out_outsample_KNN_score)
 print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_KNN_score))
 
 
-# In[47]:
+# ### XGBoost Classifcation
 
-
-### XGBoost Classifcation
-
-
-# In[48]:
+# In[46]:
 
 
 score_xgb = acc_cv(model_xgb)
@@ -886,7 +920,7 @@ OS_HO_scores.append(hold_out_outsample_xgb_score)
 print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_xgb_score))
 
 
-# In[49]:
+# In[47]:
 
 
 # Create Overview DataFrame
@@ -897,12 +931,12 @@ scores_df.sort_values(by=['CV_Score'], inplace=True, ascending=False)
 scores_df.reset_index(inplace=True, drop=True)
 
 
-# ## Evaluation of Scores
-
-# In[66]:
+# In[48]:
 
 
 scores = {'RFC' : score_RFC.mean()*100,
+                   'LGR': score_LGR.mean()*100,
+                   'DTC': score_DTC.mean()*100,
                    'SVC': score_SVC.mean()*100, 
                    'KNN' : score_KNN.mean()*100, 
                    'XGB' : score_xgb.mean()*100}
@@ -917,7 +951,7 @@ for item in values :
     formatted_values.append("%.2f"%item)
 
 
-barplot = plt.bar(keys, values, edgecolor='black', color=['C2', 'C0', 'C1', 'C3'])
+barplot = plt.bar(keys, values, edgecolor='black', color=['C2', 'C0', 'C1', 'C4', 'C3', 'C5'])
 plt.title("Accuracy Scores of Algorithms in percentages")
 plt.xlabel("Algorithms")
 plt.ylabel("Accuracy")
@@ -934,14 +968,452 @@ for x,y,z in zip(keys,values,formatted_values):
 
 plt.show()
 
-scores_df.head(4)
+scores_df.head(6)
 
+
+# As we can see XGBoost Classification, Random forest Classification and Decision Trees Classifier have the best scores. They will not be subjected to a grid search to find the most optimal parameters. 
+
+# ## Grid Search
+
+# ### XGBoost
+
+# #### Max_depth and Min_Child Weight
+
+# In[49]:
+
+
+param_test1 = {'max_depth':range(3,10,2),
+ 'min_child_weight':range(1,6,2)}
+gsearch1 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=6,
+ min_child_weight=1, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test1, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch1.fit(train,y_train)
+gsearch1.best_params_, gsearch1.best_score_
+
+
+# In[50]:
+
+
+# Higher Precision around previously found value
+param_test2 = {'max_depth':range(8,9,10),
+ 'min_child_weight':range(4,5,6)}
+gsearch2 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=9,
+ min_child_weight=5, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test2, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch2.fit(train,y_train)
+gsearch2.best_params_, gsearch2.best_score_
+
+
+# #### Gamma
+
+# In[51]:
+
+
+param_test3 = {
+ 'gamma':[i/10.0 for i in range(0,10)]
+}
+gsearch3 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test3, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch3.fit(train,y_train)
+gsearch3.best_params_, gsearch3.best_score_
+
+
+# #### SubSample and Colsample_bytree
+
+# In[52]:
+
+
+param_test4 = {
+ 'subsample':[i/10.0 for i in range(6,10)],
+ 'colsample_bytree':[i/10.0 for i in range(6,10)]
+}
+gsearch4 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test4, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch4.fit(train,y_train)
+gsearch4.best_params_, gsearch4.best_score_
+
+
+# In[53]:
+
+
+# Higher Precision around previously found value
+param_test5 = {
+ 'subsample':[i/100.0 for i in range(70,90,5)],
+ 'colsample_bytree':[i/100.0 for i in range(50,70,5)]
+}
+gsearch5 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test5, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch5.fit(train,y_train)
+gsearch5.best_params_, gsearch5.best_score_
+
+
+# #### Reg_Alpha
+
+# In[54]:
+
+
+# Higher Precision around previously found value
+param_test6 = {
+ 'reg_alpha':[1e-5, 1e-2, 0.1, 1, 100]
+}
+gsearch6 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = 0.5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test6, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch6.fit(train,y_train)
+gsearch6.best_params_, gsearch6.best_score_
+
+
+# In[55]:
+
+
+param_test7 = {
+ 'reg_alpha':[0,0.0000001, 0.000001, 0.00001, 0.0001, 0.001]
+}
+gsearch7 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test7, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch7.fit(train,y_train)
+gsearch7.best_params_, gsearch7.best_score_
+
+
+# #### Learning Rate
+
+# In[56]:
+
+
+param_test8 = {
+ 'learning_rate':[i/10.0 for i in range(0,10)]
+}
+gsearch8 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test8, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch8.fit(train,y_train)
+gsearch8.best_params_, gsearch8.best_score_
+
+
+# In[57]:
+
+
+param_test9 = {
+ 'learning_rate':[i/100 for i in range(0,20)]
+}
+gsearch9 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test9, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch9.fit(train,y_train)
+gsearch9.best_params_, gsearch9.best_score_
+
+
+# #### n_estimators
+
+# In[58]:
+
+
+param_test10 = {
+ 'n_estimators': range(100,500,50)
+}
+gsearch10 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test10, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch10.fit(train,y_train)
+gsearch10.best_params_, gsearch10.best_score_
+
+
+# In[59]:
+
+
+param_test11 = {
+ 'n_estimators': range(160,240,10)
+}
+gsearch11 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=350, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test11, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch11.fit(train,y_train)
+gsearch11.best_params_, gsearch11.best_score_
+
+
+# #### reg_lambda
+
+# In[60]:
+
+
+param_test12 = {
+ 'reg_lambda': [i/10 for i in range(0,10)]
+}
+gsearch12 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=230, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test12, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch12.fit(train,y_train)
+gsearch12.best_params_, gsearch12.best_score_
+
+
+# In[61]:
+
+
+param_test13 = {
+ 'reg_lambda': [i/100 for i in range(40,60)]
+}
+gsearch13 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=230, max_depth=8,
+ min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+ objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
+ param_grid = param_test13, scoring='accuracy',n_jobs=6,iid=False, cv=5)
+gsearch13.fit(train,y_train)
+gsearch13.best_params_, gsearch13.best_score_
+
+
+# ### Random Forest
+
+# #### Max_depth and Min_Child Weight
+
+# In[62]:
+
+
+rfc=RandomForestClassifier(random_state=123, n_jobs = -1)
+param_test12 = { 
+    'n_estimators': range(100,500,100),
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'max_depth' : [5,10,20,40,80],
+    'criterion' :['gini', 'entropy']
+}
+gsearch12 = GridSearchCV(estimator=rfc, param_grid=param_test12, cv= 5, n_jobs=6, scoring = 'accuracy')
+gsearch12.fit(train,y_train)
+gsearch12.best_params_, gsearch12.best_score_
+
+
+# In[63]:
+
+
+rfc=RandomForestClassifier(random_state=123, n_jobs = -1, criterion='gini', max_features = 'auto')
+param_test13 = { 
+    'n_estimators': range(250,350,10),
+    'max_depth' : range(30,60,5),
+}
+gsearch13 = GridSearchCV(estimator=rfc, param_grid=param_test13, cv= 5, n_jobs=6, scoring = 'accuracy')
+gsearch13.fit(train,y_train)
+gsearch13.best_params_, gsearch13.best_score_
+
+
+# ### Decision Trees
+
+# In[64]:
+
+
+dtc=DecisionTreeClassifier(random_state=123)
+param_test14 = { 
+    'max_depth' : [5,10,20,40,80],
+    'criterion' :['gini', 'entropy'], 
+    'min_samples_leaf' : range(20,80,10)
+}
+gsearch14 = GridSearchCV(estimator=dtc, param_grid=param_test14, cv= 5, n_jobs=6, scoring = 'accuracy')
+gsearch14.fit(train,y_train)
+gsearch14.best_params_, gsearch14.best_score_
+
+
+# In[65]:
+
+
+dtc=DecisionTreeClassifier(random_state=123, criterion='gini')
+param_test15 = { 
+    'max_depth' : range(6,19,1),
+    'min_samples_leaf' : range(25,75,5)
+}
+gsearch15 = GridSearchCV(estimator=dtc, param_grid=param_test15, cv= 5, n_jobs=6, scoring = 'accuracy')
+gsearch15.fit(train,y_train)
+gsearch15.best_params_, gsearch15.best_score_
+
+
+# ### Input Found Values
+
+# In[66]:
+
+
+model_DTC = DecisionTreeClassifier(max_depth=10, max_features = None, min_samples_leaf = 30, criterion = 'gini')
+
+model_RFC = RandomForestClassifier(criterion = 'gini', max_features = 'auto', n_estimators = 290, max_depth=55)
+
+
+model_xgb = xgb.XGBClassifier(colsample_bytree=.6, gamma=.4, 
+                             learning_rate=0.08, max_depth=8, 
+                             min_child_weight=5, n_estimators=230,
+                             reg_alpha=0, reg_lambda = 0.41,
+                             subsample=.8, silent=1, scale_pos_weight = 1,
+                             random_state =123, nthread = -1)
+
+
+# ## Final Run of chosen Algorithms
+
+# In[67]:
+
+
+# Initizialise List to save results
+modelnames = ['Random forest Classification', 'Decision Trees Classifier', 'XGBoost Classification']
+CV_scores = []
+OS_HO_scores = []
+IS_HO_scores = []
+
+
+# ### Random Forest Classification
+
+# In[68]:
+
+
+score_RFC = acc_cv(model_RFC)
+print("Random Forest Cross-Val Accuracy score: {:.4f} ({:.4f})\n".format(score_RFC.mean(), score_RFC.std()))
+CV_scores.append(score_RFC.mean())
+
+#####Hold-Out#####
+model_RFC.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
+
+RFC_train_pred = model_RFC.predict(HO_X_train1) #InSample Holdout RMSE
+
+RFC_pred_HO = model_RFC.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
+print("\n")
+print("########In-Sample Hold-Out########")
+print(pd.crosstab(HO_y_train_CL, RFC_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_insample_RFC_score = accuracy_score(HO_y_train_CL, RFC_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_RFC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_RFC_score))
+print("\n")
+print("########Out-Of-Sample Hold-Out########")
+print(pd.crosstab(HO_y_test_CL, RFC_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_outsample_RFC_score = accuracy_score(HO_y_test_CL, RFC_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_RFC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_RFC_score))
+
+
+# ### Decision Tree Classification
+
+# In[69]:
+
+
+score_DTC = acc_cv(model_DTC)
+print("Decision Trees Cross-Val Accuracy score: {:.4f} ({:.4f})\n".format(score_DTC.mean(), score_DTC.std()))
+CV_scores.append(score_DTC.mean())
+
+#####Hold-Out#####
+model_DTC.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
+
+DTC_train_pred = model_DTC.predict(HO_X_train1) #InSample Holdout RMSE
+
+DTC_pred_HO = model_DTC.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
+print("\n")
+print("########In-Sample Hold-Out########")
+print(pd.crosstab(HO_y_train_CL, DTC_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_insample_DTC_score = accuracy_score(HO_y_train_CL, DTC_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_DTC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_DTC_score))
+print("\n")
+print("########Out-Of-Sample Hold-Out########")
+print(pd.crosstab(HO_y_test_CL, DTC_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_outsample_DTC_score = accuracy_score(HO_y_test_CL, DTC_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_DTC_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_DTC_score))
+
+
+# ### XGBoost Classification
+
+# In[70]:
+
+
+score_xgb = acc_cv(model_xgb)
+print("Xgboost Accuracy score: {:.4f} ({:.4f})\n".format(score_xgb.mean(), score_xgb.std()))
+CV_scores.append(score_xgb.mean())
+
+#####Hold-Out#####
+model_xgb.fit(HO_X_train1, HO_y_train_CL) #Hold-Out
+
+xgb_train_pred = model_xgb.predict(HO_X_train1) #InSample Holdout RMSE
+
+xgb_pred_HO = model_xgb.predict(HO_X_test1) #Out of Sample Holdout RMSE
+
+print("\n")
+print("########In-Sample Hold-Out########")
+print(pd.crosstab(HO_y_train_CL, xgb_train_pred, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_insample_xgb_score = accuracy_score(HO_y_train_CL, xgb_train_pred, normalize=True, sample_weight=None)
+IS_HO_scores.append(hold_out_insample_xgb_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_insample_xgb_score))
+print("\n")
+print("########Out-Of-Sample Hold-Out########")
+print(pd.crosstab(HO_y_test_CL, xgb_pred_HO, rownames=['Actual'], colnames=['Predicted'], margins=True))
+hold_out_outsample_xgb_score = accuracy_score(HO_y_test_CL, xgb_pred_HO, normalize=True, sample_weight=None)
+OS_HO_scores.append(hold_out_outsample_xgb_score)
+print("Out-Of-Sample Hold-Out Accuracy = {:.4f}".format(hold_out_outsample_xgb_score))
+
+
+# ### Compare Results
+
+# In[71]:
+
+
+# Create Overview DataFrame
+scores_tuples = list(zip(modelnames,CV_scores, OS_HO_scores, IS_HO_scores))
+scores_df = pd.DataFrame(scores_tuples, columns=['Model','CV_Score', 'HO_Out-Of-Sample_Score','HO_In-Sample_Score'])
+scores_df = scores_df.round(4)
+scores_df.sort_values(by=['CV_Score'], inplace=True, ascending=False)
+scores_df.reset_index(inplace=True, drop=True)
+
+
+# In[72]:
+
+
+scores = {'RFC' : score_RFC.mean()*100,
+                   'DTC': score_DTC.mean()*100, 
+                   'XGB' : score_xgb.mean()*100}
+scores_sorted = {k: v for k, v in sorted(scores.items(), reverse=True, key=lambda item: item[1])}
+
+scores_sorted
+keys = scores_sorted.keys()
+values = scores_sorted.values()
+
+formatted_values = []
+for item in values :
+    formatted_values.append("%.2f"%item)
+
+
+barplot = plt.bar(keys, values, edgecolor='black', color=['C2', 'C0', 'C1'])
+plt.title("Accuracy Scores of Algorithms in percentages")
+plt.xlabel("Algorithms")
+plt.ylabel("Accuracy")
+for x,y,z in zip(keys,values,formatted_values):
+
+    label = z
+
+    plt.annotate(label, # this is the text
+                 (x,y), # this is the point to label
+                 textcoords="offset points", # how to position the text
+                 xytext=(0,-25), # distance from text to points (x,y)
+                 ha='center', # horizontal alignment can be left, right or center 
+                 color='w', size=14)
+
+plt.show()
+
+scores_df.head(3)
+
+
+# ## Evaluation of Scores
 
 # There are two models who are predicting with high accuracy namely: XGBoost and Random Forest. I will use both these in the Loan officer app of step 9. I will also print both of the generaterd predicted values to a CSV since both of these algorithms seem to be quite accuracte. 
 
 # ## Exporting Predictions
 
-# In[51]:
+# In[84]:
 
 
 model_xgb.fit(train, y_train) #Train on Full Train Data
@@ -950,7 +1422,7 @@ xgb_pred_df = pd.DataFrame(xgb_pred)
 xgb_pred_df.to_csv('xgb_classifier_pred.csv',index=True)
 
 
-# In[52]:
+# In[85]:
 
 
 c = list(xgb_pred.astype("int"))
@@ -985,16 +1457,16 @@ ax.set_xticklabels(range(0,2))
 plt.show()
 
 
-# In[56]:
+# In[80]:
 
 
 model_RFC.fit(train, y_train) #Train on Full Train Data
 RFC_pred = model_RFC.predict(test) #Predict on Test
 RFC_pred_df = pd.DataFrame(RFC_pred)
-RFC_pred_df.to_csv('xgb_classifier_pred.csv',index=False)
+RFC_pred_df.to_csv('RFC_classifier_pred.csv',index=False)
 
 
-# In[57]:
+# In[76]:
 
 
 c = list(RFC_pred.astype("int"))
@@ -1031,7 +1503,7 @@ plt.show()
 
 # ##### Stop Code Timing
 
-# In[55]:
+# In[77]:
 
 
 print("--- %s seconds ---" % (time.time() - start_time))

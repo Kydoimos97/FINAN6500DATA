@@ -32,7 +32,7 @@ warnings.warn = ingore_warn #Ignore warnings
 # Lists to show in Combos
 
 train = pd.read_excel("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/data/SBA_training_data.xlsx")
-recession = pd.read_csv("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/JHDUSRGDPBR.csv")
+recession = pd.read_csv("https://github.com/Kydoimos97/FINAN6500DATA/raw/master/data/JHDUSRGDPBR.csv")
 
 
 # Recession Code 
@@ -66,7 +66,7 @@ for i in train.index:
         train.at[i, 'RevLineCr'] = "Y"
     
 
-print(train['LowDoc'].value_counts())
+
 
 for i in train.index:
     if train.iloc[i,train.columns.get_loc('LowDoc')] != "Y":
@@ -74,7 +74,7 @@ for i in train.index:
     else:
         train.at[i, 'LowDoc'] = "Y"
         
-print(train['LowDoc'].value_counts())
+
 
 
 #Number 5
@@ -86,11 +86,11 @@ for i in train.index:
     else:
         train.at[i, 'ChgOffDate'] = 0
         
-print(train['ChgOffDate'].value_counts())
+
 
 
 #Number 10 
-print(train['FranchiseCode'].value_counts())
+
 
 for i in train.index:
     if train.iloc[i,train.columns.get_loc('FranchiseCode')] > 1:
@@ -98,19 +98,17 @@ for i in train.index:
     else:
         train.at[i, 'FranchiseCode'] = 0
         
-print(train['FranchiseCode'].value_counts())
 
 
-# Number 1
+#Number 1
 train.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
 
 # Number 2
-train.dropna(subset=['NAICS'], inplace=True)
+train.drop(columns=['NAICS'], inplace=True)
 
 # Number 6
 train.dropna(subset=['Bank'], inplace=True)
 train.dropna(subset=['BankState'], inplace=True)
-train.dropna(subset=['DisbursementDate'], inplace=True)
 
 # Number 7
 train.drop(columns=['BalanceGross'], inplace=True)
@@ -122,10 +120,9 @@ train.dropna(subset=['MIS_Status'], inplace=True)
 train.drop(columns=['City'], inplace=True)
 train.drop(columns=['Zip'], inplace=True)
 
-#Remove Specific Dates
+#Remove Specific Dates?
 train.drop(columns=['ApprovalDate'], inplace=True)
 train.drop(columns=['DisbursementDate'], inplace=True)
-train.drop(columns=['NAICS'], inplace=True)
 
 
 
@@ -345,7 +342,7 @@ def getInput():
     loan_y_ChgOffDate=loan_y_ChgOffDate.astype('int')
     
     #Drop Targets
-    if loan_train.shape[1] != 17:
+    if loan_train.shape[1] != 19:
         loan_train.drop(['ChgOffDate', 'MIS_Status', 'ChgOffPrinGr'], axis=1, inplace=True)
     else:
         pass
@@ -415,14 +412,15 @@ def getInput():
     # XGBoost
     import xgboost as xgb
     
-    model_RFC = RandomForestClassifier(n_jobs = -1)
-    
-    model_xgb = xgb.XGBClassifier(colsample_bytree=0.5, gamma=0.5, 
-                                 learning_rate=0.1, max_depth=6, 
-                                 min_child_weight=1.5, n_estimators=2200,
-                                 reg_alpha=0.25, reg_lambda=0.5,
-                                 subsample=0.5, silent=1,
-                                 random_state =7, nthread = -1)
+    model_RFC = RandomForestClassifier(criterion = 'gini', max_features = 'auto', n_estimators = 290, max_depth=55)
+
+
+    model_xgb = xgb.XGBClassifier(colsample_bytree=.6, gamma=.4, 
+                             learning_rate=0.08, max_depth=8, 
+                             min_child_weight=5, n_estimators=230,
+                             reg_alpha=0, reg_lambda = 0.41,
+                             subsample=.8, silent=1, scale_pos_weight = 1,
+                             random_state =123, nthread = -1)
     
     loan_y_train = loan_y_ChgOffDate
     
@@ -462,9 +460,9 @@ logo = tk.PhotoImage(file="logo.gif",master=app)
 
 w1 = tk.Label(app, image=logo).grid(column=2, row=0, columnspan = 2)
 
-explanation = """Fill in the Customer information. Use the buttons for free input
-to check if input is correct. If one Alogirthm predicts default, 
-do research to make a better informed decision"""
+explanation = """Fill in the Customer Information. Use the buttons for free input
+to check if the data is correct. If one Algorithm predicts default, 
+research to make a better-informed decision."""
 
 w2 = tk.Label(app, 
               justify=tk.LEFT,
