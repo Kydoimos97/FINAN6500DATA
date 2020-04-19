@@ -1419,7 +1419,7 @@ scores_df.head(3)
 model_xgb.fit(train, y_train) #Train on Full Train Data
 xgb_pred = model_xgb.predict(test) #Predict on Test
 xgb_pred_df = pd.DataFrame(xgb_pred)
-xgb_pred_df.to_csv('xgb_classifier_pred.csv',index=True)
+xgb_pred_df.to_csv('xgb_classifier_pred.csv',index=False)
 
 
 # In[85]:
