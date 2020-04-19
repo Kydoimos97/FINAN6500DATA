@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # -*- coding: utf-8 -*-
 """
-Created on Wed Apr 13 07:10:38 2020
+print(Created on Wed Apr 13 07:10:38 2020)
 
 @author: willem van der Schans
 """
@@ -41,7 +41,7 @@ def ingore_warn(*args, **kwargs):
     pass
 warnings.warn = ingore_warn #Ignore warnings
 
-pd.set_option('display.max_rows', 15)
+#pd.set_option('display.max_rows', 15)
 
 
 # # Import Data
@@ -100,33 +100,12 @@ plt.xlabel('Features', fontsize=15)
 
 
 # After carefull consideration and exploration of the train data set these are the sets that will be taken to clean the data. All changes made are according to the codebook, If the data does not reflect the codebook entries or description it is deemed an error and therefore has to be cleaned.
-#  
-# 1. Remove LoanNr_ChkDgt and Name: as they are idenifier variables they can be removed since an algorithm will not be able to extract usefull conntection from variables like this.
-#  
-# 2. NAICS will also be removed due to the large amount of 0's which will cause the alogirthm to pool these entries together when they should not be. 
-#  
-# 3. RevLineCr will be imputed like this: if row[RevlineCr] != Y then impute N. Aka a mode imputation. This variable will be checked for noise in the final scores and be evaluated for removal.
-#  
-# 4. LowDOC will also get a mode impitation the C will become a N. 
-#  
-# 5. CHgOffDate will be changed to a boolean with 0= NA and 1= Any date, this since it can be assumed that if there is no date then there has never been default.
-# 
-# 6. DisimbursementDate, Bank, Bankstate all have a low amount of NA's the rows in which these NA's occur will be removed. This leaves the train data with a large enough sample size for algorithms to work properly, it will however reduce noise. 
-#  
-# 7. BalanceGross will be removed as this variable only contains 0's and nothing else therefore being effectively uselss for any predictive analytics. 
-#  
-# 8. MIS_stats will also have it's rows removed in which na's occur like number 6.
-#  
-# 9. Remove City and ZIP
-# 
-# 10. Franchise to Binary 0 for no franchise 1 for franchise 
 
 # ### Na imputation
 
 # In[7]:
 
 
-#Number 3  
 print(train['RevLineCr'].value_counts())
 
 for i in train.index:
@@ -141,7 +120,6 @@ print(train['RevLineCr'].value_counts())
 # In[8]:
 
 
-#Number 4  
 print(train['LowDoc'].value_counts())
 
 for i in train.index:
@@ -156,7 +134,6 @@ print(train['LowDoc'].value_counts())
 # In[9]:
 
 
-#Number 5
 train['ChgOffDate'] = train['ChgOffDate'].fillna(0)
 
 for i in train.index:
@@ -171,7 +148,6 @@ print(train['ChgOffDate'].value_counts())
 # In[10]:
 
 
-#Number 10 
 print(train['FranchiseCode'].value_counts())
 
 for i in train.index:
@@ -186,27 +162,26 @@ print(train['FranchiseCode'].value_counts())
 # In[11]:
 
 
-# Number 1
 train.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
 
-# Number 2
+
 train.drop(columns=['NAICS'], inplace=True)
 
-# Number 6
+
 train.dropna(subset=['Bank'], inplace=True)
 train.dropna(subset=['BankState'], inplace=True)
 
-# Number 7
+
 train.drop(columns=['BalanceGross'], inplace=True)
 
-# Number 8
+
 train.dropna(subset=['MIS_Status'], inplace=True)
 
-#Number 9
+
 train.drop(columns=['City'], inplace=True)
 train.drop(columns=['Zip'], inplace=True)
 
-#Remove Specific Dates?
+
 train.drop(columns=['ApprovalDate'], inplace=True)
 train.drop(columns=['DisbursementDate'], inplace=True)
 
@@ -262,7 +237,6 @@ plt.xlabel('Features', fontsize=15)
 # In[15]:
 
 
-#Number 3  
 print(test['RevLineCr'].value_counts())
 
 for i in test.index:
@@ -277,7 +251,7 @@ print(test['RevLineCr'].value_counts())
 # In[16]:
 
 
-#Number 4  
+
 print(test['LowDoc'].value_counts())
 
 for i in test.index:
@@ -292,7 +266,6 @@ print(test['LowDoc'].value_counts())
 # In[17]:
 
 
-#Number 10 
 print(test['FranchiseCode'].value_counts())
 
 for i in test.index:
@@ -307,24 +280,24 @@ print(test['FranchiseCode'].value_counts())
 # In[18]:
 
 
-# Number 1
+
 test.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
 
-# Number 2
+
 test.drop(columns=['NAICS'], inplace=True)
 
-# Number 6
+
 test.dropna(subset=['Bank'], inplace=True)
 test.dropna(subset=['BankState'], inplace=True)
 
-# Number 7
+
 test.drop(columns=['BalanceGross'], inplace=True)
 
-#Number 9
+
 test.drop(columns=['City'], inplace=True)
 test.drop(columns=['Zip'], inplace=True)
 
-#Remove Specific Dates?
+
 test.drop(columns=['ApprovalDate'], inplace=True)
 test.drop(columns=['DisbursementDate'], inplace=True)
 
@@ -369,7 +342,7 @@ print("Train Dimensions:", format(train.shape))
 print("Test Dimensions:", format(test.shape))
 
 
-# As we can see there are some entries lost however this method is more robust then any reasonable form of imputation especially regarding the missing bank entries. Guessing what bank was the bank that issues these loans is risky and not statstically robust. The sample size of what is left is sufficient to perform predictive analysis without overfitting. 
+# As we can see there are some entries lost however this method is more robust then any reasonable form of imputation especially regarding the missing bank entries. Guessing what bank was the bank that issues these loans is risky and not statistically robust. The sample size of what is left is sufficient to perform predictive analysis.
 
 # ## Merge Data Sets
 
@@ -476,7 +449,7 @@ y_ChgOffPrinGr = y_ChgOffPrinGr.astype('int')
 
 # ## Target Variable
 
-# For the target variable I will use CHGOffDate with classification algortihms. I chose this variable because when cleaning the data set I changed more about MIS_Status then I did to ChgOffDate therefore making ChgOffDate a more relibable predictor. Also after trying over and over again to improve regression scores on ChgOffPrinGr I ended up with an error of around 50k. I ran into the variable having a zero-inflated probability distribution which I don't know how to deal with as if now. I therefore chose to remove this variable as a target and focus on classification. 
+# For the target variable I will use CHGOffDate with classification algortihms. I chose this variable because when cleaning the data set I changed more about MIS_Status then I did to ChgOffDate therefore making ChgOffDate a more relibable predictor. Also after trying over and over again to improve regression scores on ChgOffPrinGr I ended up with an error of around 50k which I deemed unreliable and therefore dropped these efforts.
 
 # In[27]:
 
@@ -529,7 +502,7 @@ sns.heatmap(correlation, xticklabels=correlation.columns.values,
 
 # ## Label Encoding
 
-# Bank is label encoded since one-hot encoding it will create a data set that is so big it hinders performance to an extreme degree. 
+# Bank is label encoded since one-hot encoding it will create a data set that is so big it hinders performance to an extreme degree additionally one-hot encoding this variable does not improve performance of the algorithms. 
 
 # In[29]:
 
@@ -553,7 +526,7 @@ numeric_feats = alldata.dtypes[alldata.dtypes == "int64"].index
 
 # Check the skew of all numerical features
 skewed_feats = alldata[numeric_feats].apply(lambda x: skew(x.dropna())).sort_values(ascending=False)
-print("\nSkew in numerical features: \n")
+print("\nSkew in numerical features before transformations: \n")
 skewness = pd.DataFrame({'Skew' :skewed_feats})
 skewness.head(21)
 
@@ -574,7 +547,7 @@ numeric_feats = alldata.dtypes[alldata.dtypes == "int64"].index
 
 # Check the skew of all numerical features
 skewed_feats = alldata[numeric_feats].apply(lambda x: skew(x.dropna())).sort_values(ascending=False)
-print("\nSkew in numerical features: \n")
+print("\nSkew in numerical features after transformations: \n")
 skewness = pd.DataFrame({'Skew' :skewed_feats})
 skewness.head(21)
 
@@ -624,7 +597,7 @@ test = alldata[ntrain:]
 
 # ## Hold-Out evaluation 
 
-# I do this since the correct answers aren't available and I want to make sure my algorithms perform. By utilizing crossvalidation and Hold-Out evaluation I can be confident about my results. This also allows me to easily see my insample accuracy which means I can combat overfitting more easily.
+# I do this since the correct answers aren't available and I want to make sure my algorithms perform. By utilizing cross-validation and Hold-Out evaluation I can be confident about my results. This also allows me to easily see my in-sample accuracy which means I can combat over-fitting more easily.
 
 # In[36]:
 
@@ -974,6 +947,8 @@ scores_df.head(6)
 # As we can see XGBoost Classification, Random forest Classification and Decision Trees Classifier have the best scores. They will not be subjected to a grid search to find the most optimal parameters. 
 
 # ## Grid Search
+
+# After speaking to my Professor he notified me about grid searching which Intrigued me. I wanted to learn how to do this and this project seemed like a perfect chance to do so. 
 
 # ### XGBoost
 
@@ -1409,11 +1384,19 @@ scores_df.head(3)
 
 # ## Evaluation of Scores
 
-# There are two models who are predicting with high accuracy namely: XGBoost and Random Forest. I will use both these in the Loan officer app of step 9. I will also print both of the generaterd predicted values to a CSV since both of these algorithms seem to be quite accuracte. 
+# There are two models who are predicting with high accuracy namely: XGBoost and Random Forest. I will use both these in the Loan officer app of step 9. I will also print both of the generaterd predicted values to a CSV since both of these algorithms seem to be quite accuracte. Note that since I cleaned my test data, the final prediction count is 999 and not 1000, for easy evaluation I will also export my test data after cleaning. 
+
+# ## Exporting Test Data
+
+# In[73]:
+
+
+test.to_csv('test_clean.csv',index=False)
+
 
 # ## Exporting Predictions
 
-# In[84]:
+# In[74]:
 
 
 model_xgb.fit(train, y_train) #Train on Full Train Data
@@ -1422,7 +1405,7 @@ xgb_pred_df = pd.DataFrame(xgb_pred)
 xgb_pred_df.to_csv('xgb_classifier_pred.csv',index=False)
 
 
-# In[85]:
+# In[75]:
 
 
 c = list(xgb_pred.astype("int"))
@@ -1457,7 +1440,7 @@ ax.set_xticklabels(range(0,2))
 plt.show()
 
 
-# In[80]:
+# In[76]:
 
 
 model_RFC.fit(train, y_train) #Train on Full Train Data
@@ -1466,7 +1449,7 @@ RFC_pred_df = pd.DataFrame(RFC_pred)
 RFC_pred_df.to_csv('RFC_classifier_pred.csv',index=False)
 
 
-# In[76]:
+# In[77]:
 
 
 c = list(RFC_pred.astype("int"))
@@ -1503,7 +1486,7 @@ plt.show()
 
 # ##### Stop Code Timing
 
-# In[77]:
+# In[78]:
 
 
 print("--- %s seconds ---" % (time.time() - start_time))

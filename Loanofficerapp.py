@@ -57,7 +57,7 @@ train['Recession'] = train['ApprovalFY']
 train['Recession'] = train['Recession'].replace(rename_dict)
 train['Recession'].fillna(0, inplace=True)
 
-#Number 3  
+# Cleaning Train Data
 
 for i in train.index:
     if train.iloc[i,train.columns.get_loc('RevLineCr')] != "Y":
@@ -77,7 +77,7 @@ for i in train.index:
 
 
 
-#Number 5
+
 train['ChgOffDate'] = train['ChgOffDate'].fillna(0)
 
 for i in train.index:
@@ -89,7 +89,7 @@ for i in train.index:
 
 
 
-#Number 10 
+
 
 
 for i in train.index:
@@ -100,27 +100,15 @@ for i in train.index:
         
 
 
-#Number 1
+
 train.drop(columns=['LoanNr_ChkDgt', 'Name'], inplace=True)
-
-# Number 2
 train.drop(columns=['NAICS'], inplace=True)
-
-# Number 6
 train.dropna(subset=['Bank'], inplace=True)
 train.dropna(subset=['BankState'], inplace=True)
-
-# Number 7
 train.drop(columns=['BalanceGross'], inplace=True)
-
-# Number 8
 train.dropna(subset=['MIS_Status'], inplace=True)
-
-#Number 9
 train.drop(columns=['City'], inplace=True)
 train.drop(columns=['Zip'], inplace=True)
-
-#Remove Specific Dates?
 train.drop(columns=['ApprovalDate'], inplace=True)
 train.drop(columns=['DisbursementDate'], inplace=True)
 
