@@ -1,0 +1,10 @@
+4/28/2020
+
+Please note that the Documentation PDF is slightly depreciated
+while the gist of the message is still the same there have been a number of changes to code. 
+
+The hyperparamters of the XGBoost Classifier have been updated this has a number of effect on the final output. 
+The final accuracy scores and predictions have been increased and changed respectively. 
+This is not yet reflected in the documentation I will update this as soon as possible. 
+
+Thank you.
