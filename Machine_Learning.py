@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # -*- coding: utf-8 -*-
@@ -958,7 +958,7 @@ scores_df.head(6)
 
 
 param_test1 = {'max_depth':range(3,10,2),
- 'min_child_weight':range(1,6,2)}
+ 'min_child_weight':range(1,8,2)}
 gsearch1 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=6,
  min_child_weight=1, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
@@ -971,8 +971,8 @@ gsearch1.best_params_, gsearch1.best_score_
 
 
 # Higher Precision around previously found value
-param_test2 = {'max_depth':range(8,9,10),
- 'min_child_weight':range(4,5,6)}
+param_test2 = {'max_depth':(8,9,10),
+ 'min_child_weight':(4,5,6)}
 gsearch2 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=9,
  min_child_weight=5, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
@@ -989,8 +989,8 @@ gsearch2.best_params_, gsearch2.best_score_
 param_test3 = {
  'gamma':[i/10.0 for i in range(0,10)]
 }
-gsearch3 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+gsearch3 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.5, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test3, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch3.fit(train,y_train)
@@ -1006,8 +1006,8 @@ param_test4 = {
  'subsample':[i/10.0 for i in range(6,10)],
  'colsample_bytree':[i/10.0 for i in range(6,10)]
 }
-gsearch4 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+gsearch4 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test4, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch4.fit(train,y_train)
@@ -1022,8 +1022,8 @@ param_test5 = {
  'subsample':[i/100.0 for i in range(70,90,5)],
  'colsample_bytree':[i/100.0 for i in range(50,70,5)]
 }
-gsearch5 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
+gsearch5 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.5, colsample_bytree=0.8, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test5, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch5.fit(train,y_train)
@@ -1039,8 +1039,8 @@ gsearch5.best_params_, gsearch5.best_score_
 param_test6 = {
  'reg_alpha':[1e-5, 1e-2, 0.1, 1, 100]
 }
-gsearch6 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = 0.5,
+gsearch6 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = 0.5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test6, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch6.fit(train,y_train)
@@ -1053,8 +1053,8 @@ gsearch6.best_params_, gsearch6.best_score_
 param_test7 = {
  'reg_alpha':[0,0.0000001, 0.000001, 0.00001, 0.0001, 0.001]
 }
-gsearch7 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5,
+gsearch7 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test7, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch7.fit(train,y_train)
@@ -1069,8 +1069,8 @@ gsearch7.best_params_, gsearch7.best_score_
 param_test8 = {
  'learning_rate':[i/10.0 for i in range(0,10)]
 }
-gsearch8 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch8 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test8, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch8.fit(train,y_train)
@@ -1083,8 +1083,8 @@ gsearch8.best_params_, gsearch8.best_score_
 param_test9 = {
  'learning_rate':[i/100 for i in range(0,20)]
 }
-gsearch9 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch9 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test9, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch9.fit(train,y_train)
@@ -1099,8 +1099,8 @@ gsearch9.best_params_, gsearch9.best_score_
 param_test10 = {
  'n_estimators': range(100,500,50)
 }
-gsearch10 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch10 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test10, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch10.fit(train,y_train)
@@ -1111,10 +1111,10 @@ gsearch10.best_params_, gsearch10.best_score_
 
 
 param_test11 = {
- 'n_estimators': range(160,240,10)
+ 'n_estimators': range(210,290,10)
 }
-gsearch11 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=350, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch11 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=350, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test11, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch11.fit(train,y_train)
@@ -1129,8 +1129,8 @@ gsearch11.best_params_, gsearch11.best_score_
 param_test12 = {
  'reg_lambda': [i/10 for i in range(0,10)]
 }
-gsearch12 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=230, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch12 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=240, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test12, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch12.fit(train,y_train)
@@ -1143,8 +1143,8 @@ gsearch12.best_params_, gsearch12.best_score_
 param_test13 = {
  'reg_lambda': [i/100 for i in range(40,60)]
 }
-gsearch13 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.08, n_estimators=230, max_depth=8,
- min_child_weight=4, gamma=0.4, subsample=0.8, colsample_bytree=0.6, reg_lambda = .5, reg_alpha = 0,
+gsearch13 = GridSearchCV(estimator = xgb.XGBClassifier(learning_rate =0.1, n_estimators=240, max_depth=10,
+ min_child_weight=5, gamma=0.9, subsample=0.8, colsample_bytree=0.5, reg_lambda = .5, reg_alpha = 0,
  objective= 'binary:logistic', nthread=-1, scale_pos_weight=1, seed=123), 
  param_grid = param_test13, scoring='accuracy',n_jobs=6,iid=False, cv=5)
 gsearch13.fit(train,y_train)
@@ -1222,10 +1222,10 @@ model_DTC = DecisionTreeClassifier(max_depth=10, max_features = None, min_sample
 model_RFC = RandomForestClassifier(criterion = 'gini', max_features = 'auto', n_estimators = 290, max_depth=55)
 
 
-model_xgb = xgb.XGBClassifier(colsample_bytree=.6, gamma=.4, 
-                             learning_rate=0.08, max_depth=8, 
-                             min_child_weight=5, n_estimators=230,
-                             reg_alpha=0, reg_lambda = 0.41,
+model_xgb = xgb.XGBClassifier(colsample_bytree=.5, gamma=.9, 
+                             learning_rate=0.1, max_depth=10, 
+                             min_child_weight=5, n_estimators=240,
+                             reg_alpha=0, reg_lambda = 0.5,
                              subsample=.8, silent=1, scale_pos_weight = 1,
                              random_state =123, nthread = -1)
 

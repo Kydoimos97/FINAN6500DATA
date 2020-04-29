@@ -403,10 +403,10 @@ def getInput():
     model_RFC = RandomForestClassifier(criterion = 'gini', max_features = 'auto', n_estimators = 290, max_depth=55)
 
 
-    model_xgb = xgb.XGBClassifier(colsample_bytree=.6, gamma=.4, 
-                             learning_rate=0.08, max_depth=8, 
-                             min_child_weight=5, n_estimators=230,
-                             reg_alpha=0, reg_lambda = 0.41,
+    model_xgb = xgb.XGBClassifier(colsample_bytree=.5, gamma=.9, 
+                             learning_rate=0.1, max_depth=10, 
+                             min_child_weight=5, n_estimators=240,
+                             reg_alpha=0, reg_lambda = 0.5,
                              subsample=.8, silent=1, scale_pos_weight = 1,
                              random_state =123, nthread = -1)
     
